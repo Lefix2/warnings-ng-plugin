@@ -24,6 +24,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -64,13 +65,13 @@ import static io.jenkins.plugins.analysis.core.util.AffectedFilesResolver.*;
 @SuppressWarnings("PMD.CouplingBetweenObjects")
 class IssuesScanner {
     private final FilePath workspace;
-    private final Set<String> sourceDirectories;
+    private final HashSet<String> sourceDirectories;
     private final SourceCodeRetention sourceCodeRetention;
     private final Run<?, ?> run;
     private final FilePath jenkinsRootDir;
     private final Charset sourceCodeEncoding;
     private final Tool tool;
-    private final List<RegexpFilter> filters;
+    private final ArrayList<RegexpFilter> filters;
     private final TaskListener listener;
     private final String scm;
     private final BlameMode blameMode;
@@ -98,7 +99,7 @@ class IssuesScanner {
         this.sourceCodeEncoding = sourceCodeEncoding;
         this.tool = tool;
         this.workspace = workspace;
-        this.sourceDirectories = sourceDirectories;
+        this.sourceDirectories = new HashSet<>(sourceDirectories);
         this.sourceCodeRetention = sourceCodeRetention;
         this.run = run;
         this.jenkinsRootDir = jenkinsRootDir;
@@ -264,13 +265,10 @@ class IssuesScanner {
         private final Report originalReport;
         private final String sourceCodeEncoding;
         private final Blamer blamer;
-        @SuppressWarnings("serial")
-        private final Set<String> permittedSourceDirectories;
-        @SuppressWarnings("serial")
-        private final Set<String> requestedSourceDirectories;
+        private final HashSet<String> permittedSourceDirectories;
+        private final HashSet<String> requestedSourceDirectories;
         private final PostProcessingMode postProcessingMode;
-        @SuppressWarnings("serial")
-        private final List<RegexpFilter> filters;
+        private final ArrayList<RegexpFilter> filters;
         private final int linesLookAhead;
         private final String sourcePathPrefix;
         private final String targetPathPrefix;
@@ -286,9 +284,9 @@ class IssuesScanner {
             originalReport = report;
             this.sourceCodeEncoding = sourceCodeEncoding;
             this.blamer = blamer;
-            this.filters = filters;
-            this.permittedSourceDirectories = permittedSourceDirectories;
-            this.requestedSourceDirectories = requestedSourceDirectories;
+            this.filters = new ArrayList<>(filters);
+            this.permittedSourceDirectories = new HashSet<>(permittedSourceDirectories);
+            this.requestedSourceDirectories = new HashSet<>(requestedSourceDirectories);
             this.postProcessingMode = postProcessingMode;
             this.linesLookAhead = linesLookAhead;
             this.sourcePathPrefix = sourcePathPrefix;

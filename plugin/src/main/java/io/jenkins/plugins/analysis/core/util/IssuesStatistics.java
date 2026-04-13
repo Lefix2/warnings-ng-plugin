@@ -9,7 +9,6 @@ import edu.hm.hafner.analysis.Severity;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Function;
@@ -45,10 +44,8 @@ public class IssuesStatistics implements Serializable {
 
     private final int fixedSize;
 
-    @SuppressWarnings("serial")
-    private final Map<Severity, Integer> totalSizeBySeverity = new HashMap<>();
-    @SuppressWarnings("serial")
-    private final Map<Severity, Integer> newSizeBySeverity = new HashMap<>();
+    private final HashMap<Severity, Integer> totalSizeBySeverity = new HashMap<>();
+    private final HashMap<Severity, Integer> newSizeBySeverity = new HashMap<>();
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     IssuesStatistics(

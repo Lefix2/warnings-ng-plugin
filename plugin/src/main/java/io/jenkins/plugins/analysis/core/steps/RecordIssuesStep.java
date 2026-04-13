@@ -45,6 +45,8 @@ import io.jenkins.plugins.prism.SourceCodeRetention;
 import io.jenkins.plugins.util.QualityGateEvaluator;
 import io.jenkins.plugins.util.ValidationUtilities;
 
+import static java.util.stream.Collectors.*;
+
 /**
  * Pipeline step that scans report files or the console log for issues. Stores the created issues in an {@link
  * AnalysisResult}. The result is attached to the {@link Run} by registering a {@link ResultAction}.
@@ -67,12 +69,10 @@ public class RecordIssuesStep extends Step implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private static final ValidationUtilities VALIDATION_UTILITIES = new ValidationUtilities();
-    @SuppressWarnings("serial")
-    private List<Tool> analysisTools = new ArrayList<>();
+    private ArrayList<Tool> analysisTools = new ArrayList<>();
 
     private String sourceCodeEncoding = StringUtils.EMPTY;
-    @SuppressWarnings("serial")
-    private Set<SourceCodeDirectory> sourceDirectories = new HashSet<>(); // @since 9.11.0
+    private HashSet<SourceCodeDirectory> sourceDirectories = new HashSet<>(); // @since 9.11.0
     private SourceCodeRetention sourceCodeRetention = SourceCodeRetention.EVERY_BUILD;
 
     private boolean ignoreQualityGate; // by default, a successful quality gate is mandatory;
@@ -80,9 +80,7 @@ public class RecordIssuesStep extends Step implements Serializable {
     private int healthy;
     private int unhealthy;
     private Severity minimumSeverity = Severity.WARNING_LOW;
-    @SuppressWarnings("serial")
-
-    private List<RegexpFilter> filters = new ArrayList<>();
+    private ArrayList<RegexpFilter> filters = new ArrayList<>();
 
     private boolean isEnabledForFailure;
     private boolean isAggregatingResults;
@@ -96,9 +94,8 @@ public class RecordIssuesStep extends Step implements Serializable {
 
     private String id = StringUtils.EMPTY;
     private String name = StringUtils.EMPTY;
-    private String icon = StringUtils.EMPTY; // @since 12.0.0: by default no custom icon is set
-    @SuppressWarnings("serial")
-    private List<WarningsQualityGate> qualityGates = new ArrayList<>();
+    private String icon = StringUtils.EMPTY; // @since 12.0.0: by default, no custom icon is set
+    private ArrayList<WarningsQualityGate> qualityGates = new ArrayList<>();
 
     private TrendChartType trendChartType = TrendChartType.AGGREGATION_TOOLS;
 
@@ -143,7 +140,7 @@ public class RecordIssuesStep extends Step implements Serializable {
     @SuppressWarnings("unused") // used by Stapler view data binding
     @DataBoundSetter
     public void setQualityGates(final List<WarningsQualityGate> qualityGates) {
-        this.qualityGates = qualityGates;
+        this.qualityGates = new ArrayList<>(qualityGates);
     }
 
     @SuppressWarnings({"unused", "WeakerAccess"}) // used by Stapler view data binding
@@ -152,7 +149,7 @@ public class RecordIssuesStep extends Step implements Serializable {
     }
 
     /**
-     * Defines the ID of the results. The ID is used as URL of the results and as name in UI elements. If no ID is
+     * Defines the ID of the results. The ID is used as URL of the results and as a name in UI elements. If no ID is
      * given, then the ID of the associated result object is used.
      *
      * <p>
@@ -237,7 +234,7 @@ public class RecordIssuesStep extends Step implements Serializable {
     @DataBoundSetter
     @Deprecated
     public void setToolProxies(final List<ToolProxy> toolProxies) {
-        analysisTools = toolProxies.stream().map(ToolProxy::getTool).collect(Collectors.toList());
+        analysisTools = toolProxies.stream().map(ToolProxy::getTool).collect(toCollection(ArrayList::new));
     }
 
     /**
@@ -303,7 +300,8 @@ public class RecordIssuesStep extends Step implements Serializable {
     public void setTool(final Tool tool) {
         ensureThatToolIsValid(tool);
 
-        analysisTools = Collections.singletonList(tool);
+        analysisTools = new ArrayList<>();
+        analysisTools.add(tool);
     }
 
     /**
