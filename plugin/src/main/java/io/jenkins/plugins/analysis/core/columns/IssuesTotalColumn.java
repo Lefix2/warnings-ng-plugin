@@ -244,7 +244,7 @@ public class IssuesTotalColumn extends ListViewColumn {
      *
      * @author Ulli Hafner
      */
-    @Extension(optional = true)
+    @Extension
     @Symbol("issueTotalsColumn")
     public static class IssuesTablePortletDescriptor extends ListViewColumnDescriptor {
         private final JenkinsFacade jenkins;

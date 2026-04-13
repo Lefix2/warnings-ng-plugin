@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
-import hudson.Extension;
+import org.jenkinsci.plugins.variant.OptionalExtension;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.plugins.view.dashboard.DashboardPortlet;
@@ -159,7 +159,7 @@ public class IssuesChartPortlet extends DashboardPortlet {
      *
      * @author Ulli Hafner
      */
-    @Extension(optional = true)
+    @OptionalExtension(requireClasses = DashboardPortlet.class)
     public static class IssuesChartPortletDescriptor extends Descriptor<DashboardPortlet> {
         @NonNull
         @Override

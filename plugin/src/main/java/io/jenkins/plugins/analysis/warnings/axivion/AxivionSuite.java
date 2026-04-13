@@ -19,8 +19,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.Serial;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
@@ -113,7 +113,7 @@ public final class AxivionSuite extends Tool {
      *         if the URL is malformed
      */
     private static String encodeProjectUrl(final String urlString) throws URISyntaxException, MalformedURLException {
-        final var url = new URL(urlString);
+        final var url = new URI(urlString).toURL();
         return new URIBuilder()
                 .setCharset(StandardCharsets.UTF_8)
                 .setHost(url.getHost())
@@ -138,7 +138,7 @@ public final class AxivionSuite extends Tool {
             this.projectUrl = projectUrl;
             return;
         }
-        
+
         try {
             this.projectUrl = encodeProjectUrl(projectUrl);
         }
@@ -254,7 +254,7 @@ public final class AxivionSuite extends Tool {
             var environmentResolver = new EnvironmentResolver();
             expandedUrl = environmentResolver.expandEnvironmentVariables(
                     run.getEnvironment(TaskListener.NULL), projectUrl);
-            
+
             if (!expandedUrl.contains("$")) {
                 expandedUrl = encodeProjectUrl(expandedUrl);
             }
@@ -321,7 +321,7 @@ public final class AxivionSuite extends Tool {
             }
 
             try {
-                new URL(projectUrl).toURI();
+                var ignore = new URI(projectUrl).toURL();
 
                 return FormValidation.ok();
             }
