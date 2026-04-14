@@ -294,7 +294,8 @@ public final class AxivionSuite extends Tool {
             }
 
             try {
-                var ignore = new URI(projectUrl).toURL();
+                // noinspection ResultOfMethodCallIgnored
+                new URI(projectUrl).toURL();
 
                 return FormValidation.ok();
             }

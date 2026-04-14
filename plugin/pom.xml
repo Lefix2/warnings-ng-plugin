@@ -571,6 +571,10 @@
           <excludes combine.children="append">
             <exclude>.*Thresholds</exclude>
             <exclude>.*Test.*</exclude>
+            <exclude>.*DescriptionProvider.*</exclude>
+            <exclude>.*AgeBuilder.*</exclude>
+            <exclude>.*StaticAnalysisToolFactory.*</exclude>
+            <exclude>.*ResultSelector.*</exclude>
             <exclude>.*Benchmark.*</exclude>
             <exclude>.*TaskScanner.*</exclude>
           </excludes>
