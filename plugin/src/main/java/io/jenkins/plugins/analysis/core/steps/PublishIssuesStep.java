@@ -47,7 +47,7 @@ import io.jenkins.plugins.util.ValidationUtilities;
  * Publish issues created by a static analysis build. The recorded issues are stored as a {@link ResultAction} in the
  * associated Jenkins build. If the issues report has a unique ID, then the created action will use this ID as well.
  * Otherwise, a default ID is used to publish the results. In any case, the computed ID can be overwritten by specifying
- * an ID as a step parameter.
+ * an ID as step parameter.
  */
 @SuppressWarnings({"InstanceVariableMayNotBeInitialized", "PMD.DataClass", "PMD.TooManyFields"})
 public class PublishIssuesStep extends Step implements Serializable {
@@ -55,7 +55,8 @@ public class PublishIssuesStep extends Step implements Serializable {
     private static final long serialVersionUID = -1833335402353771148L;
     private static final ValidationUtilities VALIDATION_UTILITIES = new ValidationUtilities();
 
-    private final ArrayList<AnnotatedReport> reports;
+    @SuppressWarnings("serial")
+    private final List<AnnotatedReport> reports;
 
     private String sourceCodeEncoding = StringUtils.EMPTY;
 
@@ -73,7 +74,8 @@ public class PublishIssuesStep extends Step implements Serializable {
     private int unhealthy;
     private Severity minimumSeverity = Severity.WARNING_LOW;
 
-    private ArrayList<WarningsQualityGate> qualityGates = new ArrayList<>();
+    @SuppressWarnings("serial")
+    private List<WarningsQualityGate> qualityGates = new ArrayList<>();
 
     private TrendChartType trendChartType = TrendChartType.AGGREGATION_TOOLS;
 
@@ -108,7 +110,7 @@ public class PublishIssuesStep extends Step implements Serializable {
     }
 
     /**
-     * Defines the ID of the results. The ID is used as URL of the results and as a name in UI elements. If no ID is
+     * Defines the ID of the results. The ID is used as URL of the results and as name in UI elements. If no ID is
      * given, then the ID of the associated result object is used.
      *
      * @param id
@@ -410,7 +412,7 @@ public class PublishIssuesStep extends Step implements Serializable {
     @DataBoundSetter
     @SuppressWarnings("unused") // Used by Stapler
     public void setQualityGates(final List<WarningsQualityGate> qualityGates) {
-        this.qualityGates = new ArrayList<>(qualityGates);
+        this.qualityGates = qualityGates;
     }
 
     @SuppressWarnings("WeakerAccess") // Required by Stapler

@@ -36,7 +36,8 @@ public class AnnotatedReport implements Serializable {
     private final Blames aggregatedBlames = new Blames();
     private final RepositoryStatistics aggregatedRepositoryStatistics = new RepositoryStatistics();
 
-    private final HashMap<String, Integer> sizeOfOrigin = new HashMap<>();
+    @SuppressWarnings("serial")
+    private final Map<String, Integer> sizeOfOrigin = new HashMap<>();
 
     /**
      * Creates a new instance of {@link AnnotatedReport}. Blames and report will be initialized empty.

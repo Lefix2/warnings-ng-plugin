@@ -8,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,15 +40,13 @@ public class ScanForIssuesStep extends Step {
     private Tool tool;
 
     private String sourceCodeEncoding = StringUtils.EMPTY;
-    @SuppressWarnings("PMD.LooseCoupling")
-    private HashSet<SourceCodeDirectory> sourceDirectories = new HashSet<>(); // @since 9.11.0
+    private Set<SourceCodeDirectory> sourceDirectories = new HashSet<>(); // @since 9.11.0
     private SourceCodeRetention sourceCodeRetention = SourceCodeRetention.EVERY_BUILD;
     private boolean skipBlames;
     private boolean skipPostProcessing; // @since 10.6.0: by default, post-processing will be enabled
     private boolean quiet;
 
-    @SuppressWarnings("PMD.LooseCoupling")
-    private ArrayList<RegexpFilter> filters = new ArrayList<>();
+    private List<RegexpFilter> filters = new ArrayList<>();
     private String scm = StringUtils.EMPTY;
 
     private String sourcePathPrefix = StringUtils.EMPTY; // @since 10.7.0
@@ -270,15 +267,16 @@ public class ScanForIssuesStep extends Step {
      */
     @SuppressFBWarnings(value = "THROWS", justification = "false positive")
     static class Execution extends AnalysisExecution<AnnotatedReport> {
-        @Serial
         private static final long serialVersionUID = -4627988939459725361L;
 
         private final Tool tool;
         private final String sourceCodeEncoding;
         private final boolean isBlameDisabled;
         private final boolean skipPostProcessing;
-        private final ArrayList<RegexpFilter> filters;
-        private final HashSet<String> sourceDirectories;
+        @SuppressWarnings("serial")
+        private final List<RegexpFilter> filters;
+        @SuppressWarnings("serial")
+        private final Set<String> sourceDirectories;
         private final String scm;
         private final boolean quiet;
         private final SourceCodeRetention sourceCodeRetention;
@@ -299,8 +297,8 @@ public class ScanForIssuesStep extends Step {
             tool = step.getTool();
             sourceCodeEncoding = step.getSourceCodeEncoding();
             isBlameDisabled = step.isSkipBlames();
-            filters = new ArrayList<>(step.getFilters());
-            sourceDirectories = new HashSet<>(step.getAllSourceDirectories());
+            filters = step.getFilters();
+            sourceDirectories = step.getAllSourceDirectories();
             sourceCodeRetention = step.getSourceCodeRetention();
             scm = step.getScm();
             skipPostProcessing = step.isSkipPostProcessing();

@@ -65,9 +65,12 @@ public final class AnalysisResult implements Serializable, StaticAnalysisRun {
 
     private IssuesStatistics totals;
 
-    private final HashMap<String, Integer> sizePerOrigin;
-    private final ArrayList<String> errors;
-    private final ArrayList<String> messages;
+    @SuppressWarnings("serial")
+    private final Map<String, Integer> sizePerOrigin;
+    @SuppressWarnings("serial")
+    private final List<String> errors;
+    @SuppressWarnings("serial")
+    private final List<String> messages;
     /**
      * Reference run to compute the issues difference: since a run cannot be persisted directly, the IDs are only
      * stored.
@@ -78,18 +81,18 @@ public final class AnalysisResult implements Serializable, StaticAnalysisRun {
     private transient Run<?, ?> owner;
 
     /**
-     * All outstanding issues: i.e., all issues that are part of the current and reference report.
+     * All outstanding issues: i.e., all issues, that are part of the current and reference report.
      */
     @CheckForNull
     private transient WeakReference<Report> outstandingIssuesReference;
     /**
-     * All new issues: i.e., all issues that are part of the current report but have not been shown up in the reference
+     * All new issues: i.e., all issues, that are part of the current report but have not been shown up in the reference
      * report.
      */
     @CheckForNull
     private transient WeakReference<Report> newIssuesReference;
     /**
-     * All fixed issues: i.e., all issues that are part of the reference report but are not present in the current
+     * All fixed issues: i.e., all issues, that are part of the reference report but are not present in the current
      * report anymore.
      */
     @CheckForNull
@@ -275,7 +278,7 @@ public final class AnalysisResult implements Serializable, StaticAnalysisRun {
      * @return this
      */
     @Serial
-    private Object readResolve() {
+    Object readResolve() {
         if (qualityGateResult == null && qualityGateStatus != null) {
             qualityGateResult = new QualityGateResult(qualityGateStatus);
         }
