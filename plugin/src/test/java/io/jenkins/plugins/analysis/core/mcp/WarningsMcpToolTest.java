@@ -2,20 +2,18 @@ package io.jenkins.plugins.analysis.core.mcp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import hudson.FilePath;
 import hudson.model.Result;
 import hudson.model.Run;
-import io.jenkins.plugins.analysis.core.model.AnalysisResult;
 import io.jenkins.plugins.analysis.core.model.ResultAction;
 import io.jenkins.plugins.mcp.server.junit.JenkinsMcpClientBuilder;
 import io.jenkins.plugins.mcp.server.junit.McpClientTest;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -50,34 +48,20 @@ class WarningsMcpToolTest {
         assertThat(run).isNotNull();
         assertThat(run.getAction(ResultAction.class)).isNotNull();
 
-        AnalysisResult warningsResult = run.getAction(ResultAction.class).getResult();
-
         try (var client = jenkinsMcpClientBuilder.jenkins(jenkins).build()) {
             McpSchema.CallToolRequest request = new McpSchema.CallToolRequest(
                     "getWarnings", Map.of("jobFullName", j.getFullName()));
 
             var response = client.callTool(request);
+            assertContainsSingleCheckstyleWarning(response);
+        }
+        try (var client = jenkinsMcpClientBuilder.jenkins(jenkins).build()) {
+            McpSchema.CallToolRequest request = new McpSchema.CallToolRequest(
+                    "getWarnings", Map.of("jobFullName", j.getFullName(),
+                    "checkId", "checkstyle"));
 
-            // Assert response
-            assertThat(response.isError()).isFalse();
-            assertThat(response.content()).hasSize(1);
-            assertThat(response.content().get(0).type()).isEqualTo("text");
-            assertThat(response.content())
-                    .first()
-                    .isInstanceOfSatisfying(McpSchema.TextContent.class, textContent ->
-                            assertThat(textContent.type()).isEqualTo("text")
-                    );
-
-            DocumentContext documentContext = JsonPath.using(Configuration.defaultConfiguration())
-                    .parse(((McpSchema.TextContent) response.content().get(0)).text());
-
-            var result = documentContext.read("$.result", Map.class);
-
-            assertThat(result.keySet()).isEqualTo(Set.of("checkstyle"));
-            Object warningsAction = result.get("checkstyle");
-            assertThat(warningsAction).isInstanceOf(List.class);
-            assertThat(((List<?>) warningsAction).size())
-                    .isEqualTo(warningsResult.getIssues().size());
+            var response = client.callTool(request);
+            assertContainsSingleCheckstyleWarning(response);
         }
         try (var client = jenkinsMcpClientBuilder.jenkins(jenkins).build()) {
             McpSchema.CallToolRequest request = new McpSchema.CallToolRequest(
@@ -112,9 +96,8 @@ class WarningsMcpToolTest {
     }
 
     @McpClientTest
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     void testMcpToolNoJob(final JenkinsRule jenkins,
-                               final JenkinsMcpClientBuilder jenkinsMcpClientBuilder) throws Exception {
+                               final JenkinsMcpClientBuilder jenkinsMcpClientBuilder) {
         try (var client = jenkinsMcpClientBuilder.jenkins(jenkins).build()) {
             McpSchema.CallToolRequest request = new McpSchema.CallToolRequest(
                     "getWarnings", Map.of("jobFullName", "missing"));
@@ -130,5 +113,20 @@ class WarningsMcpToolTest {
         McpSchema.Content firstItem = response.content().get(0);
         assertThat(firstItem.type()).isEqualTo("text");
         assertThat(((McpSchema.TextContent) firstItem).text()).contains("no results");
+    }
+
+    private void assertContainsSingleCheckstyleWarning(final McpSchema.CallToolResult response) {
+        assertThat(response.isError()).isFalse();
+        assertThat(response.content()).hasSize(1);
+        assertThat(response.content().get(0).type()).isEqualTo("text");
+        String responseText = ((McpSchema.TextContent) response.content().get(0)).text();
+        JsonObject parsed = JsonParser.parseString(responseText).getAsJsonObject();
+        JsonObject result = parsed.get("result").getAsJsonObject();
+
+        assertThat(result.keySet()).isEqualTo(Set.of("checkstyle"));
+        JsonArray warnings = result.get("checkstyle").getAsJsonArray();
+        assertThat(warnings.size()).isEqualTo(1);
+        assertThat(warnings.get(0).getAsJsonObject().keySet()).isEqualTo(
+                Set.of("category", "message", "type", "severity", "fileName", "line"));
     }
 }

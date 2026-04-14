@@ -28,6 +28,7 @@ public class WarningsMcpTool implements McpServerExtension {
      * @param checkId check action ID
      * @return map in the form {checkId1:[{category:"CAT", message:"MSG", type:"TYPE", ...}]}
      */
+    @SuppressWarnings("rawtypes")
     @Tool(
             description = "Retrieves the warnings from static analysis tools associated with a Jenkins build",
             annotations = @Tool.Annotations(destructiveHint = false))
