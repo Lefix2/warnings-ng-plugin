@@ -50,7 +50,7 @@
 
     <!-- Jenkins Plug-in Dependencies Versions -->
     <flexible-publish.version>0.16.1</flexible-publish.version>
-    <form-element-path.version>1.11</form-element-path.version>
+    <form-element-path.version>1.12</form-element-path.version>
 
     <!-- Maven Surefire ArgLine -->
     <argLine>-Djava.awt.headless=true -Xmx1024m -Djenkins.test.timeout=1000 --add-opens java.base/java.lang=ALL-UNNAMED
@@ -153,6 +153,10 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>json-path-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>variant</artifactId>
     </dependency>
 
     <!-- AxivionSuite Dependencies -->
@@ -566,6 +570,10 @@
           <excludes combine.children="append">
             <exclude>.*Thresholds</exclude>
             <exclude>.*Test.*</exclude>
+            <exclude>.*DescriptionProvider.*</exclude>
+            <exclude>.*AgeBuilder.*</exclude>
+            <exclude>.*StaticAnalysisToolFactory.*</exclude>
+            <exclude>.*ResultSelector.*</exclude>
             <exclude>.*Benchmark.*</exclude>
             <exclude>.*TaskScanner.*</exclude>
           </excludes>
