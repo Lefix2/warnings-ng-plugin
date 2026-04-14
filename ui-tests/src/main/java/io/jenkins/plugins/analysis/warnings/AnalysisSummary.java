@@ -1,7 +1,7 @@
 package io.jenkins.plugins.analysis.warnings;
 
-import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -25,7 +25,7 @@ import org.jenkinsci.test.acceptance.po.PageObject;
  * @author Michaela Reitschuster
  * @author Alexandra Wenzel
  */
-public class AnalysisSummary extends PageObject {
+public final class AnalysisSummary extends PageObject {
     private static final Pattern NUMBER = Pattern.compile("\\d+");
     private static final String AGGREGATION_MESSAGE = "Static analysis results from: ";
 
