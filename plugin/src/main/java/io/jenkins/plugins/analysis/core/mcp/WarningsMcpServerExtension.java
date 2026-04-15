@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.jenkinsci.plugins.variant.OptionalExtension;
 
 /**
- * An extension of the for MCP server providing exposing
+ * An extension of the for MCP server exposing
  * {@link io.jenkins.plugins.analysis.core.model.AnalysisResult}
  * associated with a given build as a JSON object.
  */
