@@ -7,8 +7,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import hudson.FilePath;
 import hudson.model.Result;
-import hudson.model.Run;
-import io.jenkins.plugins.analysis.core.model.ResultAction;
 import io.jenkins.plugins.mcp.server.junit.JenkinsMcpClientBuilder;
 import io.jenkins.plugins.mcp.server.junit.McpClientTest;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -23,7 +21,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
-class WarningsMcpToolTest {
+class WarningsMcpServerExtensionTest {
     @McpClientTest
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     void testMcpToolCallGetWarnings(final JenkinsRule jenkins,
@@ -40,13 +38,11 @@ class WarningsMcpToolTest {
                         """, true));
         FilePath ws = jenkins.jenkins.getWorkspaceFor(j);
         FilePath warningsFile = Objects.requireNonNull(ws).child("checkstyle.xml");
-        URL checkstyleReport = WarningsMcpToolTest.class.getResource("checkstyle-sample.xml");
+        URL checkstyleReport = WarningsMcpServerExtensionTest.class.getResource("checkstyle-sample.xml");
         assertThat(checkstyleReport).isNotNull();
         warningsFile.copyFrom(checkstyleReport);
 
-        Run<?, ?> run = jenkins.buildAndAssertStatus(Result.UNSTABLE, j);
-        assertThat(run).isNotNull();
-        assertThat(run.getAction(ResultAction.class)).isNotNull();
+        jenkins.buildAndAssertStatus(Result.UNSTABLE, j);
 
         try (var client = jenkinsMcpClientBuilder.jenkins(jenkins).build()) {
             McpSchema.CallToolRequest request = new McpSchema.CallToolRequest(

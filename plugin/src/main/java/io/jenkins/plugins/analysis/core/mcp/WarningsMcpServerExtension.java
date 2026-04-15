@@ -7,7 +7,6 @@ import io.jenkins.plugins.mcp.server.McpServerExtension;
 import io.jenkins.plugins.mcp.server.annotation.Tool;
 import io.jenkins.plugins.mcp.server.annotation.ToolParam;
 import io.jenkins.plugins.mcp.server.extensions.util.JenkinsUtil;
-import jakarta.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -16,10 +15,12 @@ import java.util.stream.Collectors;
 import org.jenkinsci.plugins.variant.OptionalExtension;
 
 /**
- * MCP tool for warnings report.
+ * An extension of the for MCP server providing exposing
+ * {@link io.jenkins.plugins.analysis.core.model.AnalysisResult}
+ * associated with a given build as a JSON object.
  */
 @OptionalExtension(requirePlugins = "mcp-server")
-public class WarningsMcpTool implements McpServerExtension {
+public class WarningsMcpServerExtension implements McpServerExtension {
     /**
      * Retrieves the warnings from static analysis tools.
      *
@@ -35,13 +36,11 @@ public class WarningsMcpTool implements McpServerExtension {
     public Map<String, Object> getWarnings(
             @ToolParam(description = "Job full name of the Jenkins job (e.g., 'folder/job-name')")
             final String jobFullName,
-            @Nullable
                     @ToolParam(
                             description =
                                     "Build number (optional, if not provided, returns the test results for last build)",
                             required = false)
                     final Integer buildNumber,
-            @Nullable
                     @ToolParam(
                             description =
                                     "ID of the check action (optional, if not provided, all warnings are returned)",
@@ -53,7 +52,6 @@ public class WarningsMcpTool implements McpServerExtension {
             run.get().getActions(ResultAction.class)
                     .stream()
                     .filter(action -> checkId == null || action.getId().equals(checkId))
-                    .filter(action -> action.getResult() != null)
                     .forEach(warningAction -> addToResponse(response, warningAction));
             return response;
         }
