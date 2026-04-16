@@ -24,6 +24,7 @@ import io.jenkins.plugins.analysis.core.charts.SeverityTrendChart;
 import io.jenkins.plugins.analysis.core.model.ResultAction;
 import io.jenkins.plugins.analysis.core.model.ToolSelection;
 import io.jenkins.plugins.analysis.core.util.AnalysisBuildResult;
+import io.jenkins.plugins.echarts.AsyncConfigurableTrendChart;
 
 import static io.jenkins.plugins.analysis.core.model.ToolSelection.*;
 
@@ -33,7 +34,7 @@ import static io.jenkins.plugins.analysis.core.model.ToolSelection.*;
  * @author Ullrich Hafner
  */
 @SuppressWarnings("PMD.DataClass")
-public class IssuesChartPortlet extends DashboardPortlet {
+public class IssuesChartPortlet extends DashboardPortlet implements AsyncConfigurableTrendChart {
     private boolean hideCleanJobs;
     private boolean selectTools;
     private List<ToolSelection> tools = new ArrayList<>();
@@ -122,8 +123,39 @@ public class IssuesChartPortlet extends DashboardPortlet {
     /**
      * Returns the UI model for an ECharts line chart that shows the issues stacked by severity.
      *
+     * @param configuration
+     *         JSON configuration of the chart (number of builds, axis type, etc.)
+     *
      * @return the UI model as JSON
      */
+    @Override
+    @JavaScriptMethod
+    @SuppressWarnings("unused") // Called by jelly view
+    public String getConfigurableBuildTrendModel(final String configuration) {
+        var severityChart = new SeverityTrendChart();
+
+        List<Iterable<? extends BuildResult<AnalysisBuildResult>>> histories = jobs.stream()
+                .filter(job -> job.getLastBuild() != null)
+                .flatMap(job -> findLastBuildWithResults(job).stream()
+                        .filter(createToolFilter(selectTools, tools)))
+                .map(ResultAction::createBuildHistory).collect(Collectors.toList());
+
+        return new JacksonFacade().toJson(
+                severityChart.aggregate(histories, ChartModelConfiguration.fromJson(configuration)));
+    }
+
+    @Override
+    public boolean isTrendVisible() {
+        return !jobs.isEmpty();
+    }
+
+    /**
+     * Returns the UI model for an ECharts line chart that shows the issues stacked by severity.
+     *
+     * @return the UI model as JSON
+     * @deprecated Use {@link #getConfigurableBuildTrendModel(String)} instead.
+     */
+    @Deprecated
     @JavaScriptMethod
     @SuppressWarnings("unused") // Called by jelly view
     public String getBuildTrendModel() {
