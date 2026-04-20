@@ -140,6 +140,30 @@ public class IssuesChartPortlet extends DashboardPortlet {
     }
 
     /**
+     * Returns the UI model for an ECharts line chart that shows the issues stacked by severity, using the specified
+     * configuration.
+     *
+     * @param configuration
+     *         JSON configuration of the chart (number of builds, axis type, etc.)
+     *
+     * @return the UI model as JSON
+     */
+    @JavaScriptMethod
+    @SuppressWarnings("unused") // Called by jelly view
+    public String getConfigurableBuildTrendModel(final String configuration) {
+        var severityChart = new SeverityTrendChart();
+
+        List<Iterable<? extends BuildResult<AnalysisBuildResult>>> histories = jobs.stream()
+                .filter(job -> job.getLastBuild() != null)
+                .flatMap(job -> findLastBuildWithResults(job).stream()
+                        .filter(createToolFilter(selectTools, tools)))
+                .map(ResultAction::createBuildHistory).collect(Collectors.toList());
+
+        return new JacksonFacade().toJson(
+                severityChart.aggregate(histories, ChartModelConfiguration.fromJson(configuration)));
+    }
+
+    /**
      * Returns the {@link ResultAction}s from the most recent build of the given job that has analysis results.
      * Walks backwards from the last build, skipping builds that failed without producing analysis data.
      *
